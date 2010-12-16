@@ -186,6 +186,14 @@ module ActionView #:nodoc:
     class << self
       delegate :erb_trim_mode=, :to => 'ActionView::Template::Handlers::ERB'
       delegate :logger, :to => 'ActionController::Base', :allow_nil => true
+
+      def cache_template_loading
+        ActionView::Resolver.caching?
+      end
+
+      def cache_template_loading=(value)
+        ActionView::Resolver.caching = value
+      end
     end
 
     attr_accessor :base_path, :assigns, :template_extension, :lookup_context
