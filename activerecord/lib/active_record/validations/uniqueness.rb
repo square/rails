@@ -36,8 +36,8 @@ module ActiveRecord
           relation = relation.where("#{record.class.quoted_table_name}.#{record.class.primary_key} <> ?", record.send(:id))
         end
 
-        if relation.exists?
-          record.errors.add(attribute, :taken, options.except(:case_sensitive, :scope).merge(:value => value))
+        if relation.where(options[:conditions]).exists?
+          record.errors.add(attribute, :taken, options.except(:case_sensitive, :scope, :conditions).merge(:value => value))
         end
       end
 
@@ -99,6 +99,14 @@ module ActiveRecord
       #     validates_uniqueness_of :teacher_id, :scope => [:semester_id, :class_id]
       #   end
       #
+      # It is also possible to limit the uniqueness constraint to a set of records matching certain conditions.
+      # In this example archived articles with are not being taken into consideration when validating uniqueness
+      # of the title attribute:
+      #
+      #   class Article < ActiveRecord::Base
+      #     validates_uniqueness_of :title, :conditions => ['status != ?', 'archived']
+      #   end
+      #
       # When the record is created, a check is performed to make sure that no record exists in the database
       # with the given value for the specified attribute (that maps to a column). When the record is updated,
       # the same check is made but disregarding the record itself.
@@ -106,6 +114,8 @@ module ActiveRecord
       # Configuration options:
       # * <tt>:message</tt> - Specifies a custom error message (default is: "has already been taken").
       # * <tt>:scope</tt> - One or more columns by which to limit the scope of the uniqueness constraint.
+      # * <tt>:conditions</tt> - Specify the conditions to be included as a <tt>WHERE</tt> SQL fragment to limit
+      #   the uniqueness constraint lookup. (e.g. <tt>:conditions => {:status => 'active'}</tt>)
       # * <tt>:case_sensitive</tt> - Looks for an exact match. Ignored by non-text columns (+true+ by default).
       # * <tt>:allow_nil</tt> - If set to true, skips this validation if the attribute is +nil+ (default is +false+).
       # * <tt>:allow_blank</tt> - If set to true, skips this validation if the attribute is blank (default is +false+).
