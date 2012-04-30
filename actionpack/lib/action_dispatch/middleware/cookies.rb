@@ -118,7 +118,6 @@ module ActionDispatch
         @delete_cookies = {}
         @host = host
         @secure = secure
-        @closed = false
         @cookies = {}
       end
 
