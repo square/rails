@@ -1797,4 +1797,9 @@ class HasManyAssociationsTest < ActiveRecord::TestCase
     assert_equal [bulb1, bulb3], car.bulbs
     assert_equal [bulb1, bulb3], result
   end
+
+  def test_collection_association_with_private_kernel_method
+    firm = companies(:first_firm)
+    assert_equal [accounts(:signals37)], firm.accounts.open
+  end
 end
