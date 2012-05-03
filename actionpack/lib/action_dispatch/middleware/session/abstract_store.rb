@@ -2,6 +2,7 @@ require 'rack/utils'
 require 'rack/request'
 require 'rack/session/abstract/id'
 require 'action_dispatch/middleware/cookies'
+require 'action_dispatch/request/session'
 require 'active_support/core_ext/object/blank'
 
 module ActionDispatch
