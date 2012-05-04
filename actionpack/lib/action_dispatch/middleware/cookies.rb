@@ -1,7 +1,7 @@
 require "active_support/core_ext/object/blank"
 
 module ActionDispatch
-  class Request
+  class Request < Rack::Request
     def cookie_jar
       env['action_dispatch.cookies'] ||= Cookies::CookieJar.build(self)
     end
