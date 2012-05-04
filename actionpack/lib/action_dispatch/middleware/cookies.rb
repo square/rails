@@ -3,7 +3,7 @@ require 'active_support/core_ext/hash/keys'
 require 'active_support/core_ext/module/attribute_accessors'
 
 module ActionDispatch
-  class Request
+  class Request < Rack::Request
     def cookie_jar
       env['action_dispatch.cookies'] ||= Cookies::CookieJar.build(self)
     end
