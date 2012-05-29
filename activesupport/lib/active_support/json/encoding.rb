@@ -161,18 +161,18 @@ class Struct
 end
 
 class TrueClass
-  AS_JSON = ActiveSupport::JSON::Variable.new('true').freeze
-  def as_json(options = nil) AS_JSON end #:nodoc:
+  def as_json(options = nil) self end #:nodoc:
+  def encode_json(encoder) to_s end #:nodoc:
 end
 
 class FalseClass
-  AS_JSON = ActiveSupport::JSON::Variable.new('false').freeze
-  def as_json(options = nil) AS_JSON end #:nodoc:
+  def as_json(options = nil) self end #:nodoc:
+  def encode_json(encoder) to_s end #:nodoc:
 end
 
 class NilClass
-  AS_JSON = ActiveSupport::JSON::Variable.new('null').freeze
-  def as_json(options = nil) AS_JSON end #:nodoc:
+  def as_json(options = nil) self end #:nodoc:
+  def encode_json(encoder) 'null' end #:nodoc:
 end
 
 class String
