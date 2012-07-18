@@ -417,8 +417,8 @@ if ActiveRecord::Base.connection.supports_migrations?
       created_at_column = created_columns.detect {|c| c.name == 'created_at' }
       updated_at_column = created_columns.detect {|c| c.name == 'updated_at' }
 
-      assert !created_at_column.null
-      assert !updated_at_column.null
+      assert created_at_column.null
+      assert updated_at_column.null
     ensure
       Person.connection.drop_table table_name rescue nil
     end
