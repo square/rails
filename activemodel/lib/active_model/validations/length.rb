@@ -16,6 +16,10 @@ module ActiveModel
           options[:maximum] -= 1 if range.exclude_end?
         end
 
+        if options[:allow_blank] == false && options[:minimum].nil? && options[:is].nil?
+          options[:minimum] = 1
+        end
+
         super
       end
 
@@ -41,7 +45,10 @@ module ActiveModel
 
         CHECKS.each do |key, validity_check|
           next unless check_value = options[key]
-          next if value_length.send(validity_check, check_value)
+
+          if !value.nil? || skip_nil_check?(key)
+            next if value_length.send(validity_check, check_value)
+          end
 
           errors_options = options.except(*RESERVED_OPTIONS)
           errors_options[:count] = check_value
@@ -64,6 +71,10 @@ module ActiveModel
           end
         end || value
       end
+
+      def skip_nil_check?(key)
+        key == :maximum && options[:allow_nil].nil? && options[:allow_blank].nil?
+      end
     end
 
     module HelperMethods
@@ -84,7 +95,8 @@ module ActiveModel
       #
       # Configuration options:
       # * <tt>:minimum</tt> - The minimum size of the attribute.
-      # * <tt>:maximum</tt> - The maximum size of the attribute.
+      # * <tt>:maximum</tt> - The maximum size of the attribute. Allows +nil+ by
+      #   default if not used with :minimum.
       # * <tt>:is</tt> - The exact size of the attribute.
       # * <tt>:within</tt> - A range specifying the minimum and maximum size of the
       #   attribute.
