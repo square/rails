@@ -479,8 +479,8 @@ module ActionController
 
         @request.assign_parameters(@routes, controller_class_name, action.to_s, parameters)
 
-        @request.session = ActionController::TestSession.new(session) if session
-        @request.session["flash"] = @request.flash.update(flash || {})
+        @request.session.update(session) if session
+        @request.flash.update(flash || {})
 
         @controller.request = @request
         build_request_uri(action, parameters)
@@ -488,6 +488,7 @@ module ActionController
         @controller.recycle!
         @controller.process_with_new_base_test(@request, @response)
         @assigns = @controller.respond_to?(:view_assigns) ? @controller.view_assigns : {}
+        @request.session['flash'] = @request.flash.to_session_value
         @request.session.delete('flash') if @request.session['flash'].blank?
         @response
       end
