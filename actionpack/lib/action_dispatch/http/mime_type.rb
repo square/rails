@@ -24,9 +24,16 @@ module Mime
   EXTENSION_LOOKUP = {}
   LOOKUP           = Hash.new { |h, k| h[k] = Type.new(k) unless k.blank? }
 
-  def self.[](type)
-    return type if type.is_a?(Type)
-    Type.lookup_by_extension(type.to_s)
+  class << self
+    def [](type)
+      return type if type.is_a?(Type)
+      Type.lookup_by_extension(type)
+    end
+
+    def fetch(type)
+      return type if type.is_a?(Type)
+      EXTENSION_LOOKUP.fetch(type.to_s) { |k| yield k }
+    end
   end
 
   # Encapsulates the notion of a mime type. Can be used at render time, for example, with:
@@ -270,6 +277,17 @@ module Mime
           super
         end
       end
+  end
+  
+  class NullType
+    def nil?
+      true
+    end
+
+    private
+    def method_missing(method, *args)
+      false if method.to_s.ends_with? '?'
+    end
   end
 end
 
