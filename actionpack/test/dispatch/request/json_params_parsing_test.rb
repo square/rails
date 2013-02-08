@@ -12,8 +12,15 @@ class JsonParamsParsingTest < ActionController::IntegrationTest
     end
   end
 
+  def setup
+    @old_parsers = ActionDispatch::ParamsParser::DEFAULT_PARSERS.dup
+    ActionDispatch::ParamsParser::DEFAULT_PARSERS.merge!(Mime::JSON => :json)
+  end
+
   def teardown
     TestController.last_request_parameters = nil
+    ActionDispatch::ParamsParser::DEFAULT_PARSERS.clear
+    ActionDispatch::ParamsParser::DEFAULT_PARSERS.merge!(@old_parsers)
   end
 
   test "parses json params for application json" do

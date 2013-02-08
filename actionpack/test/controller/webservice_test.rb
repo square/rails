@@ -24,6 +24,13 @@ class WebServiceTest < ActionController::IntegrationTest
 
   def setup
     @controller = TestController.new
+    @old_parsers = ActionDispatch::ParamsParser::DEFAULT_PARSERS.dup
+    ActionDispatch::ParamsParser::DEFAULT_PARSERS.merge!(Mime::XML => :xml_simple)
+  end
+
+  def teardown
+    ActionDispatch::ParamsParser::DEFAULT_PARSERS.clear
+    ActionDispatch::ParamsParser::DEFAULT_PARSERS.merge!(@old_parsers)
   end
 
   def test_check_parameters

@@ -5,8 +5,8 @@ require 'active_support/core_ext/hash/indifferent_access'
 module ActionDispatch
   class ParamsParser
     DEFAULT_PARSERS = {
-      Mime::XML => :xml_simple,
-      Mime::JSON => :json
+      # Mime::XML => :xml_simple,
+      # Mime::JSON => :json
     }
 
     def initialize(app, parsers = {})
