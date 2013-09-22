@@ -20,16 +20,14 @@ module ActionController
       if status.nil? && payload[:exception].present?
         status = Rack::Utils.status_code(ActionDispatch::ShowExceptions.rescue_responses[payload[:exception].first]) rescue nil 
       end 
-      message = "Completed #{status} #{Rack::Utils::HTTP_STATUS_CODES[status]} in %.0fms" % event.duration
+      message = "Completed #{status} #{Rack::Utils::HTTP_STATUS_CODES[status]} in #{format_duration(event.duration)}"
       message << " (#{additions.join(" | ")})" unless additions.blank?
 
       info(message)
     end
 
     def send_file(event)
-      message = "Sent file %s"
-      message << " (%.1fms)"
-      info(message % [event.payload[:path], event.duration])
+      info("Sent file #{event.payload[:path]} (#{format_duration(event.duration)})")
     end
 
     def redirect_to(event)
@@ -37,7 +35,7 @@ module ActionController
     end
 
     def send_data(event)
-      info("Sent data %s (%.1fms)" % [event.payload[:filename], event.duration])
+      info("Sent data #{event.payload[:filename]}  (#{format_duration(event.duration)})")
     end
 
     %w(write_fragment read_fragment exist_fragment?
@@ -46,7 +44,8 @@ module ActionController
         def #{method}(event)
           key_or_path = event.payload[:key] || event.payload[:path]
           human_name  = #{method.to_s.humanize.inspect}
-          info("\#{human_name} \#{key_or_path} (%.1fms)" % event.duration)
+          duration = format_duration(event.duration)
+          info("\#{human_name} \#{key_or_path} \#{duration}")
         end
       METHOD
     end
