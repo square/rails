@@ -42,9 +42,9 @@ class NumberHelperTest < ActionView::TestCase
   end
 
   def test_number_to_currency
-    assert_equal("&$ - 10.00", number_to_currency(10, :locale => 'ts'))
-    assert_equal("(&$ - 10.00)", number_to_currency(-10, :locale => 'ts'))
-    assert_equal("-10.00 - &$", number_to_currency(-10, :locale => 'ts', :format => "%n - %u"))
+    assert_equal("&amp;$ - 10.00", number_to_currency(10, :locale => 'ts'))
+    assert_equal("(&amp;$ - 10.00)", number_to_currency(-10, :locale => 'ts'))
+    assert_equal("-10.00 - &amp;$", number_to_currency(-10, :locale => 'ts', :format => "%n - %u"))
   end
 
   def test_number_to_currency_with_clean_i18n_settings
