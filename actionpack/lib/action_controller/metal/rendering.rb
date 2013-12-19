@@ -31,6 +31,11 @@ module ActionController
 
     private
 
+    def _process_format(format)
+      super
+      self.content_type ||= format.to_s
+    end
+
     # Normalize arguments by catching blocks and setting them on :update.
     def _normalize_args(action=nil, options={}, &blk) #:nodoc:
       options = super
