@@ -4,8 +4,5 @@ rvm:
 env:
   - "GEM=railties"
   - "GEM=ap,am,amo,ares,as"
-  - "GEM=ar:mysql"
   - "GEM=ar:mysql2"
-  - "GEM=ar:sqlite3"
-  - "GEM=ar:postgresql"
 bundler_args: --path vendor/bundle
