@@ -100,6 +100,8 @@ class PooledConnectionsTest < ActiveRecord::TestCase
   end
 
   def test_with_connection_nesting_safety
+    # https://github.com/brianmario/mysql2/issues/458
+    skip "Mysql 5.5.x bug"
     ActiveRecord::Base.establish_connection(@connection.merge({:pool => 1, :wait_timeout => 0.1}))
 
     before_count = Project.count
