@@ -176,6 +176,10 @@ module ActionView #:nodoc:
     cattr_accessor :field_error_proc
     @@field_error_proc = Proc.new{ |html_tag, instance| "<div class=\"field_with_errors\">#{html_tag}</div>".html_safe }
 
+    # Specify whether an error should be raised for missing translations
+    cattr_accessor :raise_on_missing_translations
+    @@raise_on_missing_translations = false
+
     class_attribute :helpers
     class_attribute :_routes
 
