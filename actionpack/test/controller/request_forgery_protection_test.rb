@@ -10,11 +10,11 @@ module RequestForgeryProtectionActions
   def index
     render :inline => "<%= form_tag('/') {} %>"
   end
-  
+
   def show_button
     render :inline => "<%= button_to('New', '/') {} %>"
   end
-  
+
   def remote_form
     render :inline => "<% form_remote_tag(:url => '/') {} %>"
   end
@@ -48,11 +48,11 @@ end
 
 class FreeCookieController < RequestForgeryProtectionController
   self.allow_forgery_protection = false
-  
+
   def index
     render :inline => "<%= form_tag('/') {} %>"
   end
-  
+
   def show_button
     render :inline => "<%= button_to('New', '/') {} %>"
   end
@@ -69,13 +69,22 @@ end
 
 module RequestForgeryProtectionTests
   def setup
-    @token      = "cf50faa3fe97702ca1ae"
+    # Pin the RNG to a fixed value to get predictable CSRF tokens
+    # HACK Seed in the same value many times b/c the caller is going
+    # to modify it.
+    one_time_pad = SecureRandom.random_bytes(32)
+    SecureRandom.stubs(:random_bytes)
+      .returns(one_time_pad.dup)
+      .then.returns(one_time_pad.dup)
+      .then.returns(one_time_pad.dup)
+      .then.returns(one_time_pad.dup)
 
-    ActiveSupport::SecureRandom.stubs(:base64).returns(@token)
+    @token = ActionController::AuthenticityToken.new(session).generate_masked
+
     ActionController::Base.request_forgery_protection_token = :authenticity_token
   end
-  
-  
+
+
   def test_should_render_form_with_token_tag
     assert_not_blocked do
       get :index
@@ -121,15 +130,15 @@ module RequestForgeryProtectionTests
   def test_should_allow_post_with_token
     assert_not_blocked { post :index, :authenticity_token => @token }
   end
-  
+
   def test_should_allow_put_with_token
     assert_not_blocked { put :index, :authenticity_token => @token }
   end
-  
+
   def test_should_allow_delete_with_token
     assert_not_blocked { delete :index, :authenticity_token => @token }
   end
-  
+
   def test_should_allow_post_with_token_in_header
     @request.env['HTTP_X_CSRF_TOKEN'] = @token
     assert_not_blocked { post :index }
@@ -139,7 +148,7 @@ module RequestForgeryProtectionTests
     @request.env['HTTP_X_CSRF_TOKEN'] = @token
     assert_not_blocked { delete :index }
   end
-  
+
   def test_should_allow_put_with_token_in_header
     @request.env['HTTP_X_CSRF_TOKEN'] = @token
     assert_not_blocked { put :index }
@@ -151,7 +160,7 @@ module RequestForgeryProtectionTests
     assert_nil session[:something_like_user_id], "session values are still present"
     assert_response :success
   end
-  
+
   def assert_not_blocked
     assert_nothing_raised { yield }
     assert_response :success
@@ -164,9 +173,8 @@ class RequestForgeryProtectionControllerTest < ActionController::TestCase
   include RequestForgeryProtectionTests
 
   test 'should emit a csrf-token meta tag' do
-    ActiveSupport::SecureRandom.stubs(:base64).returns(@token + '<=?')
     get :meta
-    assert_equal %(<meta name="csrf-param" content="authenticity_token"/>\n<meta name="csrf-token" content="cf50faa3fe97702ca1ae&lt;=?"/>), @response.body
+    assert_equal %(<meta name="csrf-param" content="authenticity_token"/>\n<meta name="csrf-token" content="#{@token}"/>), @response.body
   end
 end
 
@@ -188,17 +196,17 @@ class FreeCookieControllerTest < ActionController::TestCase
 
     ActiveSupport::SecureRandom.stubs(:base64).returns(@token)
   end
-  
+
   def test_should_not_render_form_with_token_tag
     get :index
     assert_select 'form>div>input[name=?][value=?]', 'authenticity_token', @token, false
   end
-  
+
   def test_should_not_render_button_to_with_token_tag
     get :show_button
     assert_select 'form>div>input[name=?][value=?]', 'authenticity_token', @token, false
   end
-  
+
   def test_should_allow_all_methods_without_token
     [:post, :put, :delete].each do |method|
       assert_nothing_raised { send(method, :index)}
@@ -227,7 +235,7 @@ class CustomAuthenticityParamControllerTest < ActionController::TestCase
   end
 
   def test_should_allow_custom_token
-    post :index, :custom_token_name => 'foobar'
+    post :index, :custom_token_name => SecureRandom.base64(64)
     assert_response :ok
   end
 end

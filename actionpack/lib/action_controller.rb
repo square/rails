@@ -42,6 +42,7 @@ module ActionController
     [Base, CGIHandler, CgiRequest, Request, Response, Http::Headers, UrlRewriter, UrlWriter]
   end
 
+  autoload :AuthenticityToken, 'action_controller/authenticity_token'
   autoload :Base, 'action_controller/base'
   autoload :Benchmarking, 'action_controller/benchmarking'
   autoload :Caching, 'action_controller/caching'
