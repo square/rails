@@ -12,7 +12,7 @@ module ActionController
 
     def generate_masked
       # Start with some random bits
-      one_time_pad = SecureRandom.random_bytes(LENGTH)
+      one_time_pad = SecureRandom.random_bytes(@master_csrf_token.length)
 
       # XOR the random bits with the real token and concatenate them
       masked_token = self.class.xor_byte_strings(one_time_pad, @master_csrf_token)
