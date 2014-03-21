@@ -43,7 +43,11 @@ module ActionController
         # value and decrypt it
         one_time_pad = decoded_token.first(LENGTH)
         masked_token = decoded_token.last(LENGTH)
-        csrf_token = self.class.xor_byte_strings(one_time_pad, masked_token)
+        begin
+          csrf_token = self.class.xor_byte_strings(one_time_pad, masked_token)
+        rescue ArgumentError
+          return false
+        end
 
         self.class.constant_time_equal?(csrf_token, @master_csrf_token)
 
@@ -55,6 +59,14 @@ module ActionController
     end
 
     def self.xor_byte_strings(s1, s2)
+      if s1.nil? || s2.nil?
+        raise ArgumentError, 'Cannot xor nil'
+      end
+
+      if s1.length != s2.length
+        raise ArgumentError, "Cannot xor strings of different lengths: #{s1.length} and #{s2.length}"
+      end
+
       s1.bytes.zip(s2.bytes).map! { |c1, c2| c1.ord ^ c2.ord }.pack('c*')
     end
 
