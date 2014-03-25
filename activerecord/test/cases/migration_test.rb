@@ -129,7 +129,7 @@ if ActiveRecord::Base.connection.supports_migrations?
     def test_add_index_length_limit
       good_index_name = 'x' * Person.connection.index_name_length
       too_long_index_name = good_index_name + 'x'
-      assert_nothing_raised { Person.connection.add_index("people", "first_name", :name => too_long_index_name) }
+      assert_raise(ArgumentError) { Person.connection.add_index("people", "first_name", :name => too_long_index_name) }
       assert !Person.connection.index_exists?("people", too_long_index_name, false)
       assert_nothing_raised { Person.connection.add_index("people", "first_name", :name => good_index_name) }
       assert Person.connection.index_exists?("people", good_index_name, false)
@@ -138,7 +138,7 @@ if ActiveRecord::Base.connection.supports_migrations?
     def test_remove_nonexistent_index
       # we do this by name, so OpenBase is a wash as noted above
       unless current_adapter?(:OpenBaseAdapter)
-        assert_nothing_raised { Person.connection.remove_index("people", "no_such_index") }
+        assert_raise(ArgumentError) { Person.connection.remove_index("people", "no_such_index") }
       end
     end
 
@@ -156,7 +156,7 @@ if ActiveRecord::Base.connection.supports_migrations?
     def test_double_add_index
       unless current_adapter?(:OpenBaseAdapter)
         Person.connection.add_index('people', [:first_name], :name => 'some_idx')
-        assert_nothing_raised { Person.connection.add_index('people', [:first_name], :name => 'some_idx') }
+        assert_raise(ArgumentError) { Person.connection.add_index('people', [:first_name], :name => 'some_idx') }
       end
     end
 
