@@ -280,11 +280,11 @@ module ActiveRecord
         end
 
         if index_name.length > index_name_length
-          @logger.warn("Index name '#{index_name}' on table '#{table_name}' is too long; the limit is #{index_name_length} characters. Skipping.")
+          raise ArgumentError, "Index name '#{index_name}' on table '#{table_name}' is too long; the limit is #{index_name_length} characters. Skipping."
           return
         end
         if index_exists?(table_name, index_name, false)
-          @logger.warn("Index name '#{index_name}' on table '#{table_name}' already exists. Skipping.")
+          raise ArgumentError, "Index name '#{index_name}' on table '#{table_name}' already exists. Skipping."
           return
         end
         quoted_column_names = quoted_columns_for_index(column_names, options).join(", ")
@@ -305,7 +305,7 @@ module ActiveRecord
       def remove_index(table_name, options = {})
         index_name = index_name(table_name, options)
         unless index_exists?(table_name, index_name, true)
-          @logger.warn("Index name '#{index_name}' on table '#{table_name}' does not exist. Skipping.")
+          raise ArgumentError, "Index name '#{index_name}' on table '#{table_name}' does not exist. Skipping."
           return
         end
         remove_index!(table_name, index_name)
