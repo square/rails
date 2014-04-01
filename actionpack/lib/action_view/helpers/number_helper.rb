@@ -62,10 +62,10 @@ module ActionView
 
         number       = number.to_s.strip
         options      = options.symbolize_keys
-        area_code    = options[:area_code] || nil
-        delimiter    = options[:delimiter] || "-"
-        extension    = options[:extension].to_s.strip || nil
-        country_code = options[:country_code] || nil
+        area_code    = ERB::Util.html_escape(options[:area_code]) if options[:area_code]
+        delimiter    = options[:delimiter] ? ERB::Util.html_escape(options[:delimiter]) : "-"
+        extension    = ERB::Util.html_escape(options[:extension].to_s).strip if options[:extension]
+        country_code = ERB::Util.html_escape(options[:country_code]) if options[:country_code]
 
         str = ""
         str << "+#{country_code}#{delimiter}" unless country_code.blank?
@@ -113,11 +113,17 @@ module ActionView
 
         options.symbolize_keys!
 
+        options[:delimiter] = ERB::Util.html_escape(options[:delimiter]) if options[:delimiter]
+        options[:separator] = ERB::Util.html_escape(options[:separator]) if options[:separator]
+        options[:format] = ERB::Util.html_escape(options[:format]) if options[:format]
+        options[:negative_format] = ERB::Util.html_escape(options[:negative_format]) if options[:negative_format]
+
         defaults  = I18n.translate(:'number.format', :locale => options[:locale], :default => {})
         currency  = I18n.translate(:'number.currency.format', :locale => options[:locale], :default => {})
 
         defaults  = DEFAULT_CURRENCY_VALUES.merge(defaults).merge!(currency)
         defaults[:negative_format] = "-" + options[:format] if options[:format]
+
         options   = defaults.merge!(options)
 
         unit      = options.delete(:unit)
@@ -164,6 +170,9 @@ module ActionView
 
         options.symbolize_keys!
 
+        options[:delimiter] = ERB::Util.html_escape(options[:delimiter]) if options[:delimiter]
+        options[:separator] = ERB::Util.html_escape(options[:separator]) if options[:separator]
+
         defaults   = I18n.translate(:'number.format', :locale => options[:locale], :default => {})
         percentage = I18n.translate(:'number.percentage.format', :locale => options[:locale], :default => {})
         defaults  = defaults.merge(percentage)
@@ -199,6 +208,9 @@ module ActionView
       #  # => 98 765 432,98
       def number_with_delimiter(number, options = {})
         options.symbolize_keys!
+
+        options[:delimiter] = ERB::Util.html_escape(options[:delimiter]) if options[:delimiter]
+        options[:separator] = ERB::Util.html_escape(options[:separator]) if options[:separator]
 
         begin
           Float(number)
@@ -462,7 +474,7 @@ module ActionView
         units = options.delete :units
         unit_exponents = case units
         when Hash
-          units
+          units = Hash[units.map { |k, v| [k, ERB::Util.html_escape(v)] }]
         when String, Symbol
           I18n.translate(:"#{units}", :locale => options[:locale], :raise => true)
         when nil
