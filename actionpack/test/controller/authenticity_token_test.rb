@@ -90,4 +90,8 @@ class AuthenticityTokenTest < ActiveSupport::TestCase
   test 'should reject a malformed token' do
     refute ActionController::AuthenticityToken.new({}).valid?(SecureRandom.base64(42))
   end
+
+  test 'should reject a non-base64 token' do
+    refute ActionController::AuthenticityToken.new({}).valid?('foo bar')
+  end
 end
