@@ -23,7 +23,11 @@ module ActionController
     def valid?(token)
       return false unless token
 
-      decoded_token = Base64.strict_decode64(token)
+      begin
+        decoded_token = Base64.strict_decode64(token)
+      rescue ArgumentError
+        return false
+      end
 
       # See if it's actually a masked token or not. In order to
       # deploy this code, we should be able to handle any unmasked
