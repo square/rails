@@ -69,18 +69,9 @@ end
 
 module RequestForgeryProtectionTests
   def setup
-    # Pin the RNG to a fixed value to get predictable CSRF tokens
-    # HACK Seed in the same value many times b/c the caller is going
-    # to modify it.
-    one_time_pad = SecureRandom.random_bytes(32)
-    SecureRandom.stubs(:random_bytes)
-      .returns(one_time_pad.dup)
-      .then.returns(one_time_pad.dup)
-      .then.returns(one_time_pad.dup)
-      .then.returns(one_time_pad.dup)
+    @token      = "l1suxmJXQO50eNOZHwu5HmiK0VNAVaC2Hr/LpPp4t00="
 
-    @token = ActionController::AuthenticityToken.new(session).generate_masked
-
+    ActiveSupport::SecureRandom.stubs(:base64).returns(@token)
     ActionController::Base.request_forgery_protection_token = :authenticity_token
   end
 
@@ -173,8 +164,9 @@ class RequestForgeryProtectionControllerTest < ActionController::TestCase
   include RequestForgeryProtectionTests
 
   test 'should emit a csrf-token meta tag' do
+    ActiveSupport::SecureRandom.stubs(:base64).returns(@token + '<=?')
     get :meta
-    assert_equal %(<meta name="csrf-param" content="authenticity_token"/>\n<meta name="csrf-token" content="#{@token}"/>), @response.body
+    assert_equal %(<meta name="csrf-param" content="authenticity_token"/>\n<meta name="csrf-token" content="l1suxmJXQO50eNOZHwu5HmiK0VNAVaC2Hr/LpPp4t00=&lt;=?"/>), @response.body
   end
 end
 
@@ -235,7 +227,7 @@ class CustomAuthenticityParamControllerTest < ActionController::TestCase
   end
 
   def test_should_allow_custom_token
-    post :index, :custom_token_name => SecureRandom.base64(64)
+    post :index, :custom_token_name => SecureRandom.base64(32)
     assert_response :ok
   end
 end
