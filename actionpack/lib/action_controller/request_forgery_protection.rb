@@ -106,7 +106,7 @@ module ActionController #:nodoc:
       # Sets the token value for the current session.  Pass a <tt>:secret</tt> option
       # in +protect_from_forgery+ to add a custom salt to the hash.
       def form_authenticity_token
-        authenticity_token.generate_masked
+        session[:_csrf_token] ||= ActiveSupport::SecureRandom.base64(32)
       end
 
       def protect_against_forgery?

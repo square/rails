@@ -30,15 +30,21 @@ module ActionController
       # tokens that we've issued without error.
       if decoded_token.length == LENGTH
         # This is actually an unmasked token
-        if @logger
-          @logger.warn "The client is using an unmasked CSRF token. This " +
-            "should only happen immediately after you upgrade to masked " +
-            "tokens; if this persists, something is wrong."
-        end
+        # if @logger
+        #   @logger.warn "The client is using an unmasked CSRF token. This " +
+        #     "should only happen immediately after you upgrade to masked " +
+        #     "tokens; if this persists, something is wrong."
+        # end
 
         self.class.constant_time_equal?(decoded_token, @master_csrf_token)
 
       elsif decoded_token.length == LENGTH * 2
+        # We don't expect to see masked tokens for now.
+        if @logger
+          @logger.warn "The client is using a masked CSRF token. If this " +
+            "persists, something is wrong."
+        end
+
         # Split the token into the one-time pad and the encrypted
         # value and decrypt it
         one_time_pad = decoded_token.first(LENGTH)
