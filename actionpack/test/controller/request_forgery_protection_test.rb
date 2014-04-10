@@ -69,7 +69,7 @@ end
 
 module RequestForgeryProtectionTests
   def setup
-    @token      = "cf50faa3fe97702ca1ae"
+    @token      = "l1suxmJXQO50eNOZHwu5HmiK0VNAVaC2Hr/LpPp4t00="
 
     ActiveSupport::SecureRandom.stubs(:base64).returns(@token)
     ActionController::Base.request_forgery_protection_token = :authenticity_token
@@ -166,7 +166,7 @@ class RequestForgeryProtectionControllerTest < ActionController::TestCase
   test 'should emit a csrf-token meta tag' do
     ActiveSupport::SecureRandom.stubs(:base64).returns(@token + '<=?')
     get :meta
-    assert_equal %(<meta name="csrf-param" content="authenticity_token"/>\n<meta name="csrf-token" content="cf50faa3fe97702ca1ae&lt;=?"/>), @response.body
+    assert_equal %(<meta name="csrf-param" content="authenticity_token"/>\n<meta name="csrf-token" content="l1suxmJXQO50eNOZHwu5HmiK0VNAVaC2Hr/LpPp4t00=&lt;=?"/>), @response.body
   end
 end
 
@@ -227,7 +227,7 @@ class CustomAuthenticityParamControllerTest < ActionController::TestCase
   end
 
   def test_should_allow_custom_token
-    post :index, :custom_token_name => 'foobar'
+    post :index, :custom_token_name => SecureRandom.base64(32)
     assert_response :ok
   end
 end
