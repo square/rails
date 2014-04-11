@@ -27,15 +27,15 @@ module ActionView
       def number_to_phone(number, options = {})
         number       = number.to_s.strip unless number.nil?
         options      = options.symbolize_keys
-        area_code    = options[:area_code] || nil
-        delimiter    = options[:delimiter] || "-"
-        extension    = options[:extension].to_s.strip || nil
-        country_code = options[:country_code] || nil
+        area_code    = ERB::Util.html_escape(options[:area_code] || nil)
+        delimiter    = ERB::Util.html_escape(options[:delimiter] || "-")
+        extension    = ERB::Util.html_escape(options[:extension].to_s.strip || nil)
+        country_code = ERB::Util.html_escape(options[:country_code] || nil)
 
         begin
           str = ""
           str << "+#{country_code}#{delimiter}" unless country_code.blank?
-          str << if area_code
+          str << if area_code.present?
             number.gsub!(/([0-9]{1,3})([0-9]{3})([0-9]{4}$)/,"(\\1) \\2#{delimiter}\\3")
           else
             number.gsub!(/([0-9]{0,3})([0-9]{3})([0-9]{4})$/,"\\1#{delimiter}\\2#{delimiter}\\3")
@@ -79,9 +79,11 @@ module ActionView
 
         precision = options[:precision] || defaults[:precision]
         unit      = options[:unit]      || defaults[:unit]
-        separator = options[:separator] || defaults[:separator]
-        delimiter = options[:delimiter] || defaults[:delimiter]
-        format    = options[:format]    || defaults[:format]
+
+        separator = ERB::Util.html_escape(options[:separator] || defaults[:separator])
+        delimiter = ERB::Util.html_escape(options[:delimiter] || defaults[:delimiter])
+        format    = ERB::Util.html_escape(options[:format]    || defaults[:format])
+
         separator = '' if precision == 0
 
         begin
@@ -110,6 +112,9 @@ module ActionView
       #  number_to_percentage(302.24398923423, :precision => 5)           # => 302.24399%
       def number_to_percentage(number, options = {})
         options.symbolize_keys!
+
+        options[:delimiter] = ERB::Util.html_escape(options[:delimiter]) if options[:delimiter]
+        options[:separator] = ERB::Util.html_escape(options[:separator]) if options[:separator]
 
         defaults   = I18n.translate(:'number.format', :locale => options[:locale], :raise => true) rescue {}
         percentage = I18n.translate(:'number.percentage.format', :locale => options[:locale], :raise => true) rescue {}
@@ -164,6 +169,9 @@ module ActionView
 
         delimiter ||= (options[:delimiter] || defaults[:delimiter])
         separator ||= (options[:separator] || defaults[:separator])
+
+        delimiter = ERB::Util.html_escape(delimiter)
+        separator = ERB::Util.html_escape(separator)
 
         begin
           parts = number.to_s.split('.')
@@ -274,6 +282,9 @@ module ActionView
         precision ||= (options[:precision] || defaults[:precision])
         separator ||= (options[:separator] || defaults[:separator])
         delimiter ||= (options[:delimiter] || defaults[:delimiter])
+
+        separator = ERB::Util.html_escape(separator)
+        delimiter = ERB::Util.html_escape(delimiter)
 
         storage_units_format = I18n.translate(:'number.human.storage_units.format', :locale => options[:locale], :raise => true)
 
