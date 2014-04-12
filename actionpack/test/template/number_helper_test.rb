@@ -3,6 +3,27 @@ require 'abstract_unit'
 class NumberHelperTest < ActionView::TestCase
   tests ActionView::Helpers::NumberHelper
 
+  def test_number_helpers_escape_delimiter_and_separator
+    assert_equal "111&lt;script&gt;&lt;/script&gt;111&lt;script&gt;&lt;/script&gt;1111", number_to_phone(1111111111, :delimiter => "<script></script>")
+
+    assert_equal "$1&lt;script&gt;&lt;/script&gt;01", number_to_currency(1.01, :separator => "<script></script>")
+    assert_equal "$1&lt;script&gt;&lt;/script&gt;000.00", number_to_currency(1000, :delimiter => "<script></script>")
+
+    assert_equal "1&lt;script&gt;&lt;/script&gt;010%", number_to_percentage(1.01, :separator => "<script></script>")
+    assert_equal "1&lt;script&gt;&lt;/script&gt;000.000%", number_to_percentage(1000, :delimiter => "<script></script>")
+
+    assert_equal "1&lt;script&gt;&lt;/script&gt;01", number_with_delimiter(1.01, :separator => "<script></script>")
+    assert_equal "1&lt;script&gt;&lt;/script&gt;000", number_with_delimiter(1000, :delimiter => "<script></script>")
+
+    assert_equal "1&lt;script&gt;&lt;/script&gt;010", number_with_precision(1.01, :separator => "<script></script>")
+    assert_equal "1&lt;script&gt;&lt;/script&gt;000.000", number_with_precision(1000, :delimiter => "<script></script>")
+
+    assert_equal "9&lt;script&gt;&lt;/script&gt;9 KB", number_to_human_size(10100, :separator => "<script></script>")
+
+    assert_equal "1&lt;script&gt;&lt;/script&gt;0001 KB", number_to_human_size(1024.1, :separator => "<script></script>", :precision => 4)
+    assert_equal "90&lt;script&gt;&lt;/script&gt;949&lt;script&gt;&lt;/script&gt;470.2 TB", number_to_human_size(10**20, :delimiter => "<script></script>")
+  end
+
   def test_number_to_phone
     assert_equal("555-1234", number_to_phone(5551234))
     assert_equal("800-555-1212", number_to_phone(8005551212))
@@ -17,6 +38,8 @@ class NumberHelperTest < ActionView::TestCase
     assert_equal("+45-22-555-1212", number_to_phone(225551212, :country_code => 45))
     assert_equal("x", number_to_phone("x"))
     assert_nil number_to_phone(nil)
+    assert_equal "+&lt;script&gt;&lt;/script&gt;8005551212", number_to_phone(8005551212, :country_code => "<script></script>", :delimiter => "")
+    assert_equal "8005551212 x &lt;script&gt;&lt;/script&gt;", number_to_phone(8005551212, :extension => "<script></script>", :delimiter => "")
   end
 
   def test_number_to_currency
@@ -30,6 +53,7 @@ class NumberHelperTest < ActionView::TestCase
     #assert_equal("$x.", number_to_currency("x")) # fails due to API consolidation
     assert_equal("$x", number_to_currency("x"))
     assert_nil number_to_currency(nil)
+    assert_equal "&lt;b&gt;1,234,567,890.50&lt;/b&gt; $", number_to_currency("1234567890.50", :format => "<b>%n</b> %u", :precision => 2)
   end
 
   def test_number_to_percentage
