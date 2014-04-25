@@ -389,6 +389,10 @@ module ActionController #:nodoc:
     def method_missing(method_name, *args, &block) #:nodoc:
       @tempfile.__send__(method_name, *args, &block)
     end
+
+    def respond_to_missing?(*args)
+      @tempfile.respond_to?(*args)
+    end
   end
 
   module TestProcess
