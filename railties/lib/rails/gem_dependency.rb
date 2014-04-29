@@ -1,3 +1,5 @@
+require 'rails/vendor_gem_source_index'
+
 module Gem
   @@source_index = nil
 
