@@ -1,10 +1,11 @@
 source 'https://rubygems.org'
 
+gemspec :path => 'activesupport'
+
 gem 'builder', '~> 2.1.2'
 gem 'erubis', '~> 2.7.0'
 gem 'i18n', '~> 0.6.9'
 gem 'json', '~> 1.8.0'
-gem 'memcache-client', '~> 1.7.4'
 gem 'mocha', '~> 0.13.1'
 gem 'mysql', '~> 2.8.1'
 gem 'nokogiri', '~> 1.3.3'

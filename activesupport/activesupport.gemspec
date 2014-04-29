@@ -9,4 +9,5 @@ Gem::Specification.new do |s|
   s.homepage = 'http://www.rubyonrails.org'
 
   s.require_path = 'lib'
+  s.add_runtime_dependency 'memcache-client', '~> 1.7.4'
 end
