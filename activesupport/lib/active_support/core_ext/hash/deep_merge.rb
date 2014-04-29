@@ -5,11 +5,12 @@ module ActiveSupport #:nodoc:
       module DeepMerge
         # Returns a new hash with +self+ and +other_hash+ merged recursively.
         def deep_merge(other_hash)
-          self.merge(other_hash) do |key, oldval, newval|
-            oldval = oldval.to_hash if oldval.respond_to?(:to_hash)
-            newval = newval.to_hash if newval.respond_to?(:to_hash)
-            oldval.class.to_s == 'Hash' && newval.class.to_s == 'Hash' ? oldval.deep_merge(newval) : newval
+          target = dup
+          other_hash.each_pair do |k,v|
+            tv = target[k]
+            target[k] = tv.is_a?(::Hash) && v.is_a?(::Hash) ? tv.deep_merge(v) : v
           end
+          target
         end
 
         # Returns a new hash with +self+ and +other_hash+ merged recursively.
