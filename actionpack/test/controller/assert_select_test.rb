@@ -9,14 +9,8 @@ require 'controller/fake_controllers'
 
 
 unless defined?(ActionMailer)
-  begin
-    $:.unshift("#{File.dirname(__FILE__)}/../../../actionmailer/lib")
-    require 'action_mailer'
-  rescue LoadError => e
-    raise unless e.message =~ /action_mailer/
-    require 'rubygems'
-    gem 'actionmailer'
-  end
+  $:.unshift("#{File.dirname(__FILE__)}/../../../actionmailer/lib")
+  require 'action_mailer'
 end
 
 ActionMailer::Base.template_root = FIXTURE_LOAD_PATH

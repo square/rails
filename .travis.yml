@@ -7,8 +7,6 @@ before_install:
   - mysql -uroot -e 'grant all on *.* to rails@localhost;'
   - mysql -urails -e 'create database activerecord_unittest;'
   - mysql -urails -e 'create database activerecord_unittest2;'
-install: "touch ~/do_not_run_bundle"
-script: "script/ci"
 branches:
   only:
     - 2-3-square
