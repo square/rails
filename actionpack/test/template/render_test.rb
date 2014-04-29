@@ -9,8 +9,8 @@ module RenderTestCases
 
     # Reload and register danish language for testing
     I18n.reload!
-    I18n.backend.store_translations 'da', {}
-    I18n.backend.store_translations 'pt-BR', {}
+    I18n.backend.store_translations 'da', "da" => {}
+    I18n.backend.store_translations 'pt-BR', "pt-BR" => {}
 
     # Ensure original are still the same since we are reindexing view paths
     assert_equal ORIGINAL_LOCALES, I18n.available_locales.map(&:to_s).sort
@@ -257,7 +257,7 @@ module TemplatesSetupTeardown
     assert_equal(new_cache_template_loading ? ActionView::Template::EagerPath : ActionView::ReloadableTemplate::ReloadablePath, view_paths.first.class)
     setup_view(view_paths)
   end
-  
+
   def teardown
     ActionView::Base.cache_template_loading = @previous_cache_template_loading
   end
