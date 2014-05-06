@@ -163,12 +163,12 @@ module ActionDispatch
             selector = hash_access_name(name, kind)
 
             # We use module_eval to avoid leaks
-            @module.module_eval <<-END_EVAL, __FILE__, __LINE__ + 1
-              def #{selector}(options = nil)                                      # def hash_for_users_url(options = nil)
-                options ? #{options.inspect}.merge(options) : #{options.inspect}  #   options ? {:only_path=>false}.merge(options) : {:only_path=>false}
-              end                                                                 # end
-              protected :#{selector}                                              # protected :hash_for_users_url
-            END_EVAL
+            @module.module_eval do
+              define_method selector do |inner_options = nil|           # def hash_for_users_url(options = nil)
+                inner_options ? options.merge(inner_options) : options  #   options ? {:only_path=>false}.merge(options) : {:only_path=>false}
+              end                                                       # end
+              protected selector                                        # protected :hash_for_users_url
+            end
             helpers << selector
           end
 
@@ -189,18 +189,18 @@ module ActionDispatch
             selector = url_helper_name(name, kind)
             hash_access_method = hash_access_name(name, kind)
 
-            @module.module_eval <<-END_EVAL, __FILE__, __LINE__ + 1
-              def #{selector}(*args)
-                options =  #{hash_access_method}(args.extract_options!)
+            @module.module_eval do
+              define_method selector do |*args|
+                options = send(hash_access_method, args.extract_options!)
 
                 if args.any?
                   options[:_positional_args] = args
-                  options[:_positional_keys] = #{route.segment_keys.inspect}
+                  options[:_positional_keys] = route.segment_keys
                 end
 
                 url_for(options)
               end
-            END_EVAL
+            end
             helpers << selector
           end
       end
