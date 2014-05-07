@@ -446,7 +446,7 @@ class LegacyRouteSetTests < Test::Unit::TestCase
     assert_equal '/test', rs.generate(:controller => 'post', :action => 'show', :year => nil)
 
     x = setup_for_named_route
-    assert_equal("http://test.host/test?year=%28%3F-mix%3A%5Cd%7B4%7D%29",
+    assert_equal("http://test.host/test",
                  x.send(:blog_url))
   end
 

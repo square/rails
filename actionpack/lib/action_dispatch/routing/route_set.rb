@@ -1,5 +1,6 @@
 require 'rack/mount'
 require 'forwardable'
+require 'active_support/core_ext/hash/slice'
 require 'active_support/core_ext/object/to_query'
 require 'action_dispatch/routing/deprecated_mapper'
 
@@ -153,7 +154,7 @@ module ActionDispatch
 
           def define_named_route_methods(name, route)
             {:url => {:only_path => false}, :path => {:only_path => true}}.each do |kind, opts|
-              hash = route.defaults.merge(route.requirements).merge(:use_route => name).merge(opts)
+              hash = route.defaults.merge(route.requirements.slice(:protocol, :subdomain, :domain, :host, :port)).merge(:use_route => name).merge(opts)
               define_hash_access route, name, kind, hash
               define_url_helper route, name, kind, hash
             end

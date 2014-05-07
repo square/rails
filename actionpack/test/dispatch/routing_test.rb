@@ -1233,7 +1233,7 @@ class TestRoutingMapper < ActionDispatch::IntegrationTest
 
   def test_root
     with_test_routes do
-      assert_equal '/?locale=%28%3F-mix%3Aen%7Cpl%29', root_path
+      assert_equal '/', root_path
       get '/'
       assert_equal 'projects#index', @response.body
     end
@@ -1349,7 +1349,7 @@ class TestRoutingMapper < ActionDispatch::IntegrationTest
   def test_optional_scoped_path
     with_test_routes do
       assert_equal '/en/descriptions', descriptions_path("en")
-      assert_equal '/descriptions?locale=%28%3F-mix%3Aen%7Cpl%29', descriptions_path(nil)
+      assert_equal '/descriptions', descriptions_path(nil)
       assert_equal '/en/descriptions/1', description_path("en", 1)
       assert_equal '/descriptions/1', description_path(nil, 1)
 
@@ -1370,7 +1370,7 @@ class TestRoutingMapper < ActionDispatch::IntegrationTest
   def test_nested_optional_scoped_path
     with_test_routes do
       assert_equal '/admin/en/descriptions', admin_descriptions_path("en")
-      assert_equal '/admin/descriptions?locale=%28%3F-mix%3Aen%7Cpl%29', admin_descriptions_path(nil)
+      assert_equal '/admin/descriptions', admin_descriptions_path(nil)
       assert_equal '/admin/en/descriptions/1', admin_description_path("en", 1)
       assert_equal '/admin/descriptions/1', admin_description_path(nil, 1)
 
@@ -1676,7 +1676,7 @@ class TestRoutingMapper < ActionDispatch::IntegrationTest
     with_test_routes do
       get '/api/1.0/users'
       assert_equal 'api/users#index', @response.body
-      assert_equal '/api/1.0/users?format=%28%3F-mix%3Ajson%7Cxml%29', api_users_path(:version => '1.0')
+      assert_equal '/api/1.0/users', api_users_path(:version => '1.0')
 
       get '/api/1.0/users.json'
       assert_equal 'api/users#index', @response.body
@@ -1686,7 +1686,7 @@ class TestRoutingMapper < ActionDispatch::IntegrationTest
       get '/api/1.0/users/first.last'
       assert_equal 'api/users#show', @response.body
       assert_equal 'first.last', @request.params[:id]
-      assert_equal '/api/1.0/users/first.last?format=%28%3F-mix%3Ajson%7Cxml%29', api_user_path(:version => '1.0', :id => 'first.last')
+      assert_equal '/api/1.0/users/first.last', api_user_path(:version => '1.0', :id => 'first.last')
 
       get '/api/1.0/users/first.last.xml'
       assert_equal 'api/users#show', @response.body
