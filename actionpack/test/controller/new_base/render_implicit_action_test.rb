@@ -31,13 +31,5 @@ module RenderImplicitAction
         SimpleController.action(action_name).call(Rack::MockRequest.env_for("/"))
       end
     end
-
-   test "available_action? does not allow File::SEPARATOR on the name" do
-      action_name = %w(evil .. .. path).join(File::SEPARATOR)
-      assert_equal false, SimpleController.new.available_action?(action_name.to_sym)
-
-      action_name = %w(evil path).join(File::SEPARATOR)
-      assert_equal false, SimpleController.new.available_action?(action_name.to_sym)
-    end
   end
 end
