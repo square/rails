@@ -233,13 +233,19 @@ module ActionDispatch
 
     # Override Rack's GET method to support indifferent access
     def GET
-      @env["action_dispatch.request.query_parameters"] ||= normalize_parameters(super)
+      @env["action_dispatch.request.query_parameters"] ||= begin
+        normalized_params = normalize_parameters(super)
+        normalized_params ? deep_munge(normalized_params) : nil
+      end
     end
     alias :query_parameters :GET
 
     # Override Rack's POST method to support indifferent access
     def POST
-      @env["action_dispatch.request.request_parameters"] ||= normalize_parameters(super)
+      @env["action_dispatch.request.request_parameters"] ||= begin
+        normalized_params = normalize_parameters(super)
+        normalized_params ? deep_munge(normalized_params) : nil
+      end
     end
     alias :request_parameters :POST
 

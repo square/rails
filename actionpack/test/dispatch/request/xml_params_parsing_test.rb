@@ -12,8 +12,15 @@ class XmlParamsParsingTest < ActionController::IntegrationTest
     end
   end
 
+  def setup
+    @old_parsers = ActionDispatch::ParamsParser::DEFAULT_PARSERS.dup
+    ActionDispatch::ParamsParser::DEFAULT_PARSERS.merge!(Mime::XML => :xml_simple)
+  end
+
   def teardown
     TestController.last_request_parameters = nil
+    ActionDispatch::ParamsParser::DEFAULT_PARSERS.clear
+    ActionDispatch::ParamsParser::DEFAULT_PARSERS.merge!(@old_parsers)
   end
 
   test "parses a strict rack.input" do
