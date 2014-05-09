@@ -66,7 +66,23 @@ module ActionDispatch
       end
     end
 
-    class FlashHash < Hash
+    class FlashHash < ActiveSupport::HashWithIndifferentAccess
+      USED_KEY = '__FLASH_USED__'
+
+      attr_writer :used
+
+      def self.from_h(h)
+        new.replace(h.except(USED_KEY)).tap do |flash|
+          flash.used = Set.new(h[USED_KEY])
+        end if h
+      end
+
+      def to_h
+        Hash[to_a].tap do |h|
+          h[USED_KEY] = @used.to_a unless @used.empty?
+        end
+      end
+
       def initialize #:nodoc:
         super
         @used = Set.new
@@ -176,7 +192,8 @@ module ActionDispatch
 
     def call(env)
       if (session = env['rack.session']) && (flash = session['flash'])
-        flash.sweep
+        swept_flash = Flash::FlashHash.from_h(flash).tap(&:sweep)
+        session['flash'] = swept_flash
       end
 
       @app.call(env)
@@ -185,10 +202,10 @@ module ActionDispatch
       flash_hash = env['action_dispatch.request.flash_hash']
 
       if flash_hash && (!flash_hash.empty? || session.key?('flash'))
-        session["flash"] = flash_hash
+        session["flash"] = flash_hash.to_h
       end
 
-      if session.key?('flash') && session['flash'].empty?
+      if session.key?('flash') && session['flash'].except(Flash::FlashHash::USED_KEY).empty?
         session.delete('flash')
       end
     end
