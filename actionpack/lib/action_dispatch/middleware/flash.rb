@@ -205,7 +205,7 @@ module ActionDispatch
         session["flash"] = flash_hash.to_h
       end
 
-      if session.key?('flash') && session['flash'].except(Flash::FlashHash::USED_KEY).empty?
+      if session.key?('flash') && Hash[session['flash']].except(Flash::FlashHash::USED_KEY).empty?
         session.delete('flash')
       end
     end
