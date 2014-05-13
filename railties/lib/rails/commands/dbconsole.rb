@@ -20,12 +20,12 @@ module Rails
     end
 
     def start
-      include_password = false
+      include_password = true
       options = {}
       OptionParser.new do |opt|
         opt.banner = "Usage: dbconsole [environment] [options]"
-        opt.on("-p", "--include-password", "Automatically provide the password from database.yml") do |v|
-          include_password = true
+        opt.on("-p", "--include-password", "Ask for password") do |v|
+          include_password = false
         end
 
         opt.on("--mode [MODE]", ['html', 'list', 'line', 'column'],
