@@ -72,7 +72,7 @@ module ActionDispatch
       attr_writer :used
 
       def self.from_h(h)
-        new.replace(h.except(USED_KEY)).tap do |flash|
+        new.replace(Hash[h].except(USED_KEY)).tap do |flash|
           flash.used = Set.new(h[USED_KEY])
         end if h
       end
