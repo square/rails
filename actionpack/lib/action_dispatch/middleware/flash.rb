@@ -72,7 +72,7 @@ module ActionDispatch
       attr_writer :used
 
       def self.from_h(h)
-        new.replace(Hash[h].except(USED_KEY)).tap do |flash|
+        new.replace(h.except(USED_KEY)).tap do |flash|
           flash.used = Set.new(h[USED_KEY])
         end if h
       end
@@ -192,7 +192,7 @@ module ActionDispatch
 
     def call(env)
       if (session = env['rack.session']) && (flash = session['flash'])
-        swept_flash = Flash::FlashHash.from_h(flash).tap(&:sweep)
+        swept_flash = Flash::FlashHash.from_h(Hash[flash]).tap(&:sweep)
         session['flash'] = swept_flash
       end
 
