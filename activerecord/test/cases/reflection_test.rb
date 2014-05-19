@@ -331,7 +331,8 @@ class ReflectionTest < ActiveRecord::TestCase
 
   private
     def assert_reflection(klass, association, options)
-      assert reflection = klass.reflect_on_association(association)
+      assert reflection = klass.reflect_on_association(association.to_s)
+      assert reflection == klass.reflect_on_association(association.to_sym)
       options.each do |method, value|
         assert_equal(value, reflection.send(method))
       end
