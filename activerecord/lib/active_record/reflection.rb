@@ -5,7 +5,7 @@ module ActiveRecord
 
     included do
       class_attribute :reflections
-      self.reflections = {}
+      self.reflections = {}.with_indifferent_access
     end
 
     # Reflection enables to interrogate Active Record classes and objects
