@@ -1,6 +1,7 @@
 require 'active_support/core_ext/object/duplicable'
 require 'active_support/core_ext/array/extract_options'
 require 'active_support/deprecation'
+require 'active_support/core_ext/hash/indifferent_access'
 
 # Retained for backward compatibility.  Methods are now included in Class.
 module ClassInheritableAttributes # :nodoc:
@@ -142,7 +143,7 @@ class Class # :nodoc:
   end
 
   def write_inheritable_hash(key, hash)
-    write_inheritable_attribute(key, {}) if read_inheritable_attribute(key).nil?
+    write_inheritable_attribute(key, {}.with_indifferent_access) if read_inheritable_attribute(key).nil?
     write_inheritable_attribute(key, read_inheritable_attribute(key).merge(hash))
   end
 
