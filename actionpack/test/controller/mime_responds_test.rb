@@ -89,8 +89,6 @@ class RespondToController < ActionController::Base
     end
   end
 
-  Mime::Type.register("text/x-mobile", :mobile)
-
   def custom_constant_handling
     respond_to do |type|
       type.html   { render :text => "HTML"   }
@@ -125,8 +123,6 @@ class RespondToController < ActionController::Base
       type.js
     end
   end
-
-  Mime::Type.register_alias("text/html", :iphone)
 
   def iphone_with_html_response_type
     request.format = :iphone if request.env["HTTP_ACCEPT"] == "text/iphone"
@@ -166,10 +162,14 @@ class RespondToControllerTest < ActionController::TestCase
   def setup
     super
     @request.host = "www.example.com"
+    Mime::Type.register_alias("text/html", :iphone)
+    Mime::Type.register("text/x-mobile", :mobile)
   end
 
   def teardown
     super
+    Mime::Type.unregister(:iphone)
+    Mime::Type.unregister(:mobile)
   end
 
   def test_html
@@ -971,7 +971,13 @@ class MimeControllerLayoutsTest < ActionController::TestCase
   def setup
     super
     @request.host = "www.example.com"
-  end
+    Mime::Type.register_alias("text/html", :iphone)
+   end
+
+   def teardown
+     super
+     Mime::Type.unregister(:iphone)
+   end
 
   def test_missing_layout_renders_properly
     get :index
