@@ -10,6 +10,34 @@ class MimeTypeTest < ActiveSupport::TestCase
     end
   end
 
+  test "parse text with trailing star at the beginning" do
+    accept = "text/*, text/html, application/json, multipart/form-data"
+    expect = [Mime::HTML, Mime::TEXT, Mime::JS, Mime::CSS, Mime::ICS, Mime::CSV, Mime::XML, Mime::YAML, Mime::JSON, Mime::MULTIPART_FORM]
+    parsed = Mime::Type.parse(accept)
+    assert_equal expect, parsed
+  end
+
+  test "parse text with trailing star in the end" do
+    accept = "text/html, application/json, multipart/form-data, text/*"
+    expect = [Mime::HTML, Mime::JSON, Mime::MULTIPART_FORM, Mime::TEXT, Mime::JS, Mime::CSS, Mime::ICS, Mime::CSV, Mime::XML, Mime::YAML]
+    parsed = Mime::Type.parse(accept)
+    assert_equal expect, parsed
+  end
+
+  test "parse text with trailing star" do
+    accept = "text/*"
+    expect = [Mime::HTML, Mime::TEXT, Mime::JS, Mime::CSS, Mime::ICS, Mime::CSV, Mime::XML, Mime::YAML, Mime::JSON]
+    parsed = Mime::Type.parse(accept)
+    assert_equal expect, parsed
+  end
+
+  test "parse application with trailing star" do
+    accept = "application/*"
+    expect = [Mime::HTML, Mime::JS, Mime::XML, Mime::RSS, Mime::ATOM, Mime::YAML, Mime::URL_ENCODED_FORM, Mime::JSON, Mime::PDF]
+    parsed = Mime::Type.parse(accept)
+    assert_equal expect, parsed
+  end
+
   test "parse without q" do
     accept = "text/xml,application/xhtml+xml,text/yaml,application/xml,text/html,image/png,text/plain,application/pdf,*/*"
     expect = [Mime::HTML, Mime::XML, Mime::YAML, Mime::PNG, Mime::TEXT, Mime::PDF, Mime::ALL]
@@ -19,6 +47,24 @@ class MimeTypeTest < ActiveSupport::TestCase
   test "parse with q" do
     accept = "text/xml,application/xhtml+xml,text/yaml; q=0.3,application/xml,text/html; q=0.8,image/png,text/plain; q=0.5,application/pdf,*/*; q=0.2"
     expect = [Mime::HTML, Mime::XML, Mime::PNG, Mime::PDF, Mime::TEXT, Mime::YAML, Mime::ALL]
+    assert_equal expect, Mime::Type.parse(accept)
+  end
+
+  test "parse single media range with q" do
+    accept = "text/html;q=0.9"
+    expect = [Mime::HTML]
+    assert_equal expect, Mime::Type.parse(accept)
+  end
+
+  test "parse any media range with q" do
+    accept = "*/*;q=0.9"
+    expect = [Mime::ALL]
+    assert_equal expect, Mime::Type.parse(accept)
+  end
+
+  test "parse arbitrary media type parameters" do
+    accept = 'multipart/form-data; boundary="simple boundary"'
+    expect = [Mime::MULTIPART_FORM]
     assert_equal expect, Mime::Type.parse(accept)
   end
 
