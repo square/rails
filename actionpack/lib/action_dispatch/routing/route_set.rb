@@ -480,6 +480,7 @@ module ActionDispatch
 
           raise "Missing host to link to! Please provide :host parameter or set default_url_options[:host]" unless options[:host]
 
+          rewritten_url << "#{options.delete(:subdomain)}." if options.key?(:subdomain)
           rewritten_url << options[:host]
           rewritten_url << ":#{options.delete(:port)}" if options.key?(:port)
         end
