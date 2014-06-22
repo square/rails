@@ -143,6 +143,10 @@ module ActionView #:nodoc:
     cattr_accessor :streaming_completion_on_exception
     @@streaming_completion_on_exception = %("><script type="text/javascript">window.location = "/500.html"</script></html>)
 
+    # Specify whether an error should be raised for missing translations
+    cattr_accessor :raise_on_missing_translations
+    @@raise_on_missing_translations = false
+
     class_attribute :helpers
     class_attribute :_routes
 

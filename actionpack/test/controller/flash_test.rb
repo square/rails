@@ -173,14 +173,14 @@ class FlashTest < ActionController::TestCase
     flash.update(:foo => :foo_indeed, :bar => :bar_indeed)
 
     assert_equal(:foo_indeed, flash.discard(:foo)) # valid key passed
-    assert_nil flash.discard(:unknown) # non existant key passed
-    assert_equal({:foo => :foo_indeed, :bar => :bar_indeed}, flash.discard().to_hash) # nothing passed
-    assert_equal({:foo => :foo_indeed, :bar => :bar_indeed}, flash.discard(nil).to_hash) # nothing passed
+    assert_nil flash.discard(:unknown) # non existent key passed
+    assert_equal({"foo" => :foo_indeed, "bar" => :bar_indeed}, flash.discard().to_hash) # nothing passed
+    assert_equal({"foo" => :foo_indeed, "bar" => :bar_indeed}, flash.discard(nil).to_hash) # nothing passed
 
     assert_equal(:foo_indeed, flash.keep(:foo)) # valid key passed
-    assert_nil flash.keep(:unknown) # non existant key passed
-    assert_equal({:foo => :foo_indeed, :bar => :bar_indeed}, flash.keep().to_hash) # nothing passed
-    assert_equal({:foo => :foo_indeed, :bar => :bar_indeed}, flash.keep(nil).to_hash) # nothing passed
+    assert_nil flash.keep(:unknown) # non existent key passed
+    assert_equal({"foo" => :foo_indeed, "bar" => :bar_indeed}, flash.keep().to_hash) # nothing passed
+    assert_equal({"foo" => :foo_indeed, "bar" => :bar_indeed}, flash.keep(nil).to_hash) # nothing passed
   end
 
   def test_redirect_to_with_alert
@@ -231,10 +231,6 @@ class FlashIntegrationTest < ActionDispatch::IntegrationTest
     def use_flash
       render :inline => "flash: #{flash["that"]}"
     end
-
-    def redirect_without_flash
-      redirect_to '/somewhere'
-    end
   end
 
   def test_flash
@@ -246,22 +242,6 @@ class FlashIntegrationTest < ActionDispatch::IntegrationTest
       get '/use_flash'
       assert_response :success
       assert_equal "flash: hello", @response.body
-    end
-  end
-
-  def test_redirect
-    with_test_route_set do
-      get '/set_flash'
-      assert_response :success
-      assert_equal "hello", @request.flash["that"]
-
-      get '/redirect_without_flash'
-      assert_response :redirect
-      assert_equal "hello", @request.flash["that"]
-
-      get '/redirect_without_flash'
-      assert_response :redirect
-      assert_equal nil, @request.flash["that"]
     end
   end
 
