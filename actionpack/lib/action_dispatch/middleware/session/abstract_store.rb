@@ -76,16 +76,6 @@ module ActionDispatch
     class AbstractStore < Rack::Session::Abstract::ID
       include Compatibility
       include StaleSessionCheck
-
-      def destroy_session(env, sid, options)
-        ActiveSupport::Deprecation.warn "Implementing #destroy in session stores is deprecated. " <<
-          "Please implement destroy_session(env, session_id, options) instead."
-        destroy(env)
-      end
-
-      def destroy(env)
-        raise '#destroy needs to be implemented.'
-      end
     end
   end
 end
