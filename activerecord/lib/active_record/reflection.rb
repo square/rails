@@ -1,6 +1,7 @@
 require 'active_support/core_ext/class/attribute'
 require 'active_support/core_ext/module/deprecation'
 require 'active_support/core_ext/object/inclusion'
+require 'active_support/core_ext/hash/indifferent_access'
 
 module ActiveRecord
   # = Active Record Reflection
@@ -9,7 +10,7 @@ module ActiveRecord
 
     included do
       class_attribute :reflections
-      self.reflections = {}
+      self.reflections = {}.with_indifferent_access
     end
 
     # Reflection enables to interrogate Active Record classes and objects

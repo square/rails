@@ -1,6 +1,5 @@
 require 'abstract_unit'
 require 'active_support/core_ext/class/inheritable_attributes'
-require 'active_support/core_ext/hash/slice'
 
 class ClassInheritableAttributesTest < Test::Unit::TestCase
   def setup
@@ -144,12 +143,12 @@ class ClassInheritableAttributesTest < Test::Unit::TestCase
     assert_nil @klass.new.a
 
     @klass.a = { :a => 'a' }
-    assert_equal('a', @klass.a[:a])
-    assert_equal('a', @klass.new.a[:a])
+    assert_equal({ :a => 'a' }, @klass.a)
+    assert_equal({ :a => 'a' }, @klass.new.a)
 
     @klass.new.a = { :b => 'b' }
-    assert_equal(['a', 'b'], @klass.a.slice(:a, :b).values)
-    assert_equal(['a', 'b'], @klass.new.a.slice(:a, :b).values)
+    assert_equal({ :a => 'a', :b => 'b' }, @klass.a)
+    assert_equal({ :a => 'a', :b => 'b' }, @klass.new.a)
   end
 
   def test_inheritance
