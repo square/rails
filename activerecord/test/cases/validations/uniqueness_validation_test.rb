@@ -320,16 +320,4 @@ class UniquenessValidationTest < ActiveRecord::TestCase
     assert topic.errors[:title].any?, "Should have errors for title"
     assert_equal ["has already been taken"], topic.errors[:title], "Should have uniqueness message for title"
   end
-
-  def test_validate_uniqueness_with_conditions
-    Topic.validates_uniqueness_of(:title, :conditions => Topic.where('approved = ?', true))
-    t1 = Topic.create("title" => "I'm a topic", "approved" => true)
-    t2 = Topic.create("title" => "I'm an unapproved topic", "approved" => false)
-
-    t3 = Topic.new("title" => "I'm a topic", "approved" => true)
-    assert !t3.valid?, "t3 shouldn't be valid"
-
-    t4 = Topic.new("title" => "I'm an unapproved topic", "approved" => false)
-    assert t4.valid?, "t4 should be valid"
-  end
 end
