@@ -16,6 +16,7 @@ require 'set'
 module ActiveSupport
   class << self
     delegate :use_standard_json_time_format, :use_standard_json_time_format=,
+      :time_precision, :time_precision=,
       :escape_html_entities_in_json, :escape_html_entities_in_json=,
       :encode_big_decimal_as_string, :encode_big_decimal_as_string=,
       :to => :'ActiveSupport::JSON::Encoding'
@@ -118,6 +119,8 @@ module ActiveSupport
         attr_accessor :escape_regex
         attr_reader :escape_html_entities_in_json
 
+        attr_accessor :time_precision
+
         def escape_html_entities_in_json=(value)
           self.escape_regex = \
             if @escape_html_entities_in_json = value
@@ -139,6 +142,7 @@ module ActiveSupport
       self.use_standard_json_time_format = true
       self.escape_html_entities_in_json  = true
       self.encode_big_decimal_as_string  = true
+      self.time_precision = 3
     end
   end
 end
@@ -310,7 +314,7 @@ end
 class Time
   def as_json(options = nil) #:nodoc:
     if ActiveSupport.use_standard_json_time_format
-      xmlschema
+      xmlschema(ActiveSupport::JSON::Encoding.time_precision)
     else
       %(#{strftime("%Y/%m/%d %H:%M:%S")} #{formatted_offset(false)})
     end
@@ -330,7 +334,7 @@ end
 class DateTime
   def as_json(options = nil) #:nodoc:
     if ActiveSupport.use_standard_json_time_format
-      xmlschema
+      xmlschema(ActiveSupport::JSON::Encoding.time_precision)
     else
       strftime('%Y/%m/%d %H:%M:%S %z')
     end
