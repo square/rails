@@ -67,17 +67,25 @@ class TimeWithZoneTest < ActiveSupport::TestCase
   end
 
   def test_to_json_with_use_standard_json_time_format_config_set_to_false
-    old, ActiveSupport.use_standard_json_time_format = ActiveSupport.use_standard_json_time_format, false
-    assert_equal "\"1999/12/31 19:00:00 -0500\"", ActiveSupport::JSON.encode(@twz)
-  ensure
-    ActiveSupport.use_standard_json_time_format = old
+    with_standard_json_time_format(false) do
+      assert_equal "\"1999/12/31 19:00:00 -0500\"", ActiveSupport::JSON.encode(@twz)
+    end
   end
 
   def test_to_json_with_use_standard_json_time_format_config_set_to_true
-    old, ActiveSupport.use_standard_json_time_format = ActiveSupport.use_standard_json_time_format, true
-    assert_equal "\"1999-12-31T19:00:00.000-05:00\"", ActiveSupport::JSON.encode(@twz)
+    with_standard_json_time_format(true) do
+      assert_equal "\"1999-12-31T19:00:00.000-05:00\"", ActiveSupport::JSON.encode(@twz)
+    end
+  end
+
+  def test_to_json_with_custom_subsecond_resolution
+    with_standard_json_time_format(true) do
+      ActiveSupport::JSON::Encoding.time_precision = 0
+
+      assert_equal "\"1999-12-31T19:00:00-05:00\"", ActiveSupport::JSON.encode(@twz)
+    end
   ensure
-    ActiveSupport.use_standard_json_time_format = old
+    ActiveSupport::JSON::Encoding.time_precision = 3
   end
 
   def test_to_json_when_wrapping_a_date_time
@@ -797,12 +805,37 @@ class TimeWithZoneTest < ActiveSupport::TestCase
     assert_no_match "rescue", e.backtrace.first
   end
 
+  def test_time_to_json_with_custom_time_precision
+    with_standard_json_time_format(true) do
+      ActiveSupport::JSON::Encoding.time_precision = 0
+      assert_equal "\"2000-01-01T00:00:00Z\"", ActiveSupport::JSON.encode(Time.utc(2000))
+    end
+  ensure
+    ActiveSupport::JSON::Encoding.time_precision = 3
+  end
+  
+  def test_datetime_to_json_with_custom_time_precision
+    with_standard_json_time_format(true) do
+      ActiveSupport::JSON::Encoding.time_precision = 0
+      assert_equal "\"2000-01-01T00:00:00+00:00\"", ActiveSupport::JSON.encode(DateTime.new(2000))
+    end
+  ensure
+    ActiveSupport::JSON::Encoding.time_precision = 3
+  end
+
   protected
     def with_env_tz(new_tz = 'US/Eastern')
       old_tz, ENV['TZ'] = ENV['TZ'], new_tz
       yield
     ensure
       old_tz ? ENV['TZ'] = old_tz : ENV.delete('TZ')
+    end
+
+    def with_standard_json_time_format(boolean = true)
+       old, ActiveSupport.use_standard_json_time_format = ActiveSupport.use_standard_json_time_format, boolean
+       yield
+    ensure
+      ActiveSupport.use_standard_json_time_format = old
     end
 end
 
