@@ -68,6 +68,11 @@ module Rails
           'socket'    => '--socket',
           'username'  => '--user',
           'encoding'  => '--default-character-set'
+          'sslca'     => '--ssl-ca',
+          'sslcert'   => '--ssl-cert',
+          'sslcapath' => '--ssl-capath',
+          'sslcipher' => '--ssh-cipher',
+          'sslkey'    => '--ssl-key'
         }.map { |opt, arg| "#{arg}=#{config[opt]}" if config[opt] }.compact
 
         if config['password'] && include_password
