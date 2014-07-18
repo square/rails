@@ -37,6 +37,10 @@ module Rails
           options['header'] = h
         end
 
+        opt.on("--shard SHARD_NAME") do |shard|
+          options['shard'] = shard
+        end
+
         opt.parse!(ARGV)
         abort opt.to_s unless (0..1).include?(ARGV.size)
       end
@@ -63,7 +67,6 @@ module Rails
       case config["adapter"]
       when /^mysql/
         args = {
-          'host'      => '--host',
           'port'      => '--port',
           'socket'    => '--socket',
           'username'  => '--user',
@@ -79,6 +82,19 @@ module Rails
           args << "--password=#{config['password']}"
         elsif config['password'] && !config['password'].to_s.empty?
           args << "-p"
+        end
+
+        if config['multidb']
+          replicas = config['multidb']['databases']
+          case options['shard']
+          when 'master'
+            args.unshift("--host=#{config['host']}")
+          else
+            db = replicas.fetch(options['shard'], { 'host' => replicas.first.last['host'] })
+            args.unshift("--host=#{db.fetch('host')}")
+          end
+        elsif config['host']
+          args.unshift("--host=#{config['host']}")
         end
 
         args << config['database']
