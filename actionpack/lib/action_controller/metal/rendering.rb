@@ -6,7 +6,7 @@ module ActionController
 
     # Before processing, set the request formats in current controller formats.
     def process_action(*) #:nodoc:
-      self.formats = request.formats.map { |x| x.ref }
+      self.formats = request.formats.map(&:ref).compact
       super
     end
 
@@ -30,6 +30,11 @@ module ActionController
     end
 
     private
+
+    def _process_format(format)
+      super
+      self.content_type ||= format.to_s
+    end
 
     # Normalize arguments by catching blocks and setting them on :update.
     def _normalize_args(action=nil, options={}, &blk) #:nodoc:

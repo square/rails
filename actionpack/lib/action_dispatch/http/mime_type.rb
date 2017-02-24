@@ -1,6 +1,7 @@
 require 'set'
-require 'active_support/core_ext/class/attribute_accessors'
-require 'active_support/core_ext/object/blank'
+require 'singleton'
+require 'active_support/core_ext/module/attribute_accessors'
+require 'active_support/core_ext/string/starts_ends_with'
 
 module Mime
   class Mimes < Array
@@ -24,9 +25,16 @@ module Mime
   EXTENSION_LOOKUP = {}
   LOOKUP           = Hash.new { |h, k| h[k] = Type.new(k) unless k.blank? }
 
-  def self.[](type)
-    return type if type.is_a?(Type)
-    Type.lookup_by_extension(type.to_s)
+  class << self
+    def [](type)
+      return type if type.is_a?(Type)
+      Type.lookup_by_extension(type)
+    end
+
+    def fetch(type)
+      return type if type.is_a?(Type)
+      EXTENSION_LOOKUP.fetch(type.to_s) { |k| yield k }
+    end
   end
 
   # Encapsulates the notion of a mime type. Can be used at render time, for example, with:
@@ -110,11 +118,7 @@ module Mime
       def parse(accept_header)
         if accept_header !~ /,/
           accept_header = accept_header.split(PARAMETER_SEPARATOR_REGEXP).first
-          if accept_header =~ TRAILING_STAR_REGEXP
-            parse_data_with_trailing_star($1)
-          else
-            [Mime::Type.lookup(accept_header)]
-          end
+          parse_trailing_star(accept_header) || [Mime::Type.lookup(accept_header)]
         else
           # keep track of creation order to keep the subsequent sort stable
           list, index = [], 0
@@ -270,6 +274,25 @@ module Mime
           super
         end
       end
+  end
+
+  class NullType
+    include Singleton
+
+    def nil?
+      true
+    end
+
+    def ref; end
+
+    def respond_to_missing?(method, include_private = false)
+      method.to_s.ends_with? '?'
+    end
+
+    private
+    def method_missing(method, *args)
+      false if method.to_s.ends_with? '?'
+    end
   end
 end
 
