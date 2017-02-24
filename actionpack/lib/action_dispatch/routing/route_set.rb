@@ -502,11 +502,11 @@ module ActionDispatch
       end
 
       def recognize_path(path, environment = {})
-        method = (environment[:method] || "GET").to_s.upcase
+        environment[:method] = (environment[:method] || "GET").to_s.upcase
         path = Rack::Mount::Utils.normalize_path(path) unless path =~ %r{://}
 
         begin
-          env = Rack::MockRequest.env_for(path, {:method => method})
+          env = Rack::MockRequest.env_for(path, environment)
         rescue URI::InvalidURIError => e
           raise ActionController::RoutingError, e.message
         end
